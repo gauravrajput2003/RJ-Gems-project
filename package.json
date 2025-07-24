@@ -1,0 +1,20 @@
+{
+  "name": "rj-gems-jewelry-store",
+  "version": "1.0.0",
+  "description": "Full-stack luxury jewelry e-commerce application with AI features",
+  "main": "server/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": ["jewelry", "e-commerce", "react", "node", "express", "mongodb", "ai"],
+  "author": "RJ Gems",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
