@@ -88,8 +88,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // MongoDB connection function
 const connectDB = async () => {
   try {
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI environment variable is required');
+    }
     await mongoose.connect(
-      process.env.MONGODB_URI || "mongodb+srv://project01:Animal%40%408000@project01.zfjbz.mongodb.net/rjgems?retryWrites=true&w=majority&appName=project01",
+      process.env.MONGODB_URI,
       {
         serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
         socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity

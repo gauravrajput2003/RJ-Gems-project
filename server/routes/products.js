@@ -245,7 +245,10 @@ router.post('/:id/regenerate-description', async (req, res) => {
     Keep it between 100-150 words and make it compelling for luxury jewelry customers.`;
 
     // Use Google Gemini API
-    const GEMINI_API_KEY = process.env.VITE_GPT_API_KEY || 'AIzaSyAsfhrGnqovYK-mk97AO5znpgfT23CZMq0';
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY environment variable is required');
+    }
     const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     const response = await fetch(GEMINI_URL, {
