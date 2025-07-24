@@ -9,10 +9,10 @@ JWT_SECRET=b14d7f2a6342d0e766a24832a6af61b0be7626a8783580f19b7d0b0ab0aa178a
 # ⚠️ YOU NEED TO GET THESE:
 MONGODB_URI=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/rjgems?retryWrites=true&w=majority
 OPENAI_API_KEY=sk-your-actual-openai-key
-GEMINI_API_KEY=your-actual-gemini-key
+GEMINI_API_KEY=AIzaSyAsfhrGnqovYK-mk97AO5znpgfT23CZMq0
 
 # 🌐 CORS (Update after frontend deployment)
-CLIENT_URL=https://your-netlify-site.netlify.app
+CLIENT_URL=https://silly-sprinkles-b1d938.netlify.app
 
 # 📝 INSTRUCTIONS:
 # 1. Create MongoDB Atlas account: https://cloud.mongodb.com/

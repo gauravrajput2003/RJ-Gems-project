@@ -1,8 +1,8 @@
 // AI Service for RJ Gems - Jewelry-focused AI features
 class AIService {
   constructor() {
-    this.apiKey = import.meta.env.VITE_GPT_API_KEY;
-    this.baseURL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    this.baseURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${this.apiKey}`;
   }
 
   // Generate product recommendations based on user preferences
