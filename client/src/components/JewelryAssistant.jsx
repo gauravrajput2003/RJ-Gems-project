@@ -19,6 +19,16 @@ const JewelryAssistant = () => {
 
   const quickQuestions = jewelryAssistantService.getQuickQuestions();
 
+  // Debug log to confirm component is rendering
+  useEffect(() => {
+    console.log('🤖 JewelryAssistant mounted, initial state:', isOpen);
+  }, []);
+
+  // Monitor state changes
+  useEffect(() => {
+    console.log('✨ AI Chatbot state changed to:', isOpen ? 'OPEN' : 'CLOSED');
+  }, [isOpen]);
+
   // Auto scroll to bottom when new messages arrive
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -84,8 +94,18 @@ const JewelryAssistant = () => {
     }
   };
 
-  const toggleChatbot = () => {
-    setIsOpen(!isOpen);
+  const toggleChatbot = (e) => {
+    console.log('🔄 TOGGLE FUNCTION CALLED!');
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    setIsOpen(prevState => {
+      const newState = !prevState;
+      console.log('🎯 State changing from', prevState, 'to', newState);
+      return newState;
+    });
   };
 
   const clearChat = () => {
@@ -103,39 +123,92 @@ const JewelryAssistant = () => {
   return (
     <>
       {/* Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-[9999]">
         <button
-          onClick={toggleChatbot}
-          className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 ${
+          type="button"
+          onClick={(e) => {
+            console.log('🎯 MAIN BUTTON CLICKED!', e);
+            e.preventDefault();
+            e.stopPropagation();
+            toggleChatbot(e);
+          }}
+          onMouseDown={() => console.log('🔽 Mouse down on AI button')}
+          onMouseUp={() => console.log('🔼 Mouse up on AI button')}
+          onMouseEnter={() => console.log('📍 AI button hover entered')}
+          onMouseLeave={() => console.log('📍 AI button hover left')}
+          className={`relative w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 transform hover:scale-110 border-2 cursor-pointer focus:outline-none ${
             isOpen 
-              ? 'bg-red-500 hover:bg-red-600 rotate-45' 
-              : 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700'
+              ? 'bg-red-500 hover:bg-red-600 rotate-45 animate-pulse border-red-400 shadow-red-500/50' 
+              : 'bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 border-blue-400 shadow-blue-500/50'
           }`}
+          style={{
+            boxShadow: isOpen 
+              ? '0 0 30px rgba(239, 68, 68, 0.8), 0 0 60px rgba(239, 68, 68, 0.4), 0 8px 32px rgba(0, 0, 0, 0.3)' 
+              : '0 0 30px rgba(59, 130, 246, 0.8), 0 0 60px rgba(59, 130, 246, 0.4), 0 8px 32px rgba(0, 0, 0, 0.3)',
+            pointerEvents: 'auto',
+            zIndex: 10000
+          }}
         >
+          {/* Enhanced pulsing ring effects */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 animate-ping opacity-30"></div>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 animate-ping opacity-15" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 animate-ping opacity-10" style={{ animationDelay: '1s' }}></div>
+          
+          {/* Enhanced sparkle effects */}
+          {!isOpen && (
+            <>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-90 shadow-lg"></div>
+              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-200 rounded-full animate-pulse shadow-md"></div>
+              <div className="absolute top-2 -left-2 w-1.5 h-1.5 bg-purple-300 rounded-full animate-bounce shadow-sm" style={{ animationDelay: '1s' }}></div>
+              <div className="absolute -top-2 left-3 w-1 h-1 bg-white rounded-full animate-ping shadow-sm" style={{ animationDelay: '1.5s' }}></div>
+              <div className="absolute bottom-2 right-1 w-1 h-1 bg-indigo-300 rounded-full animate-pulse" style={{ animationDelay: '0.7s' }}></div>
+            </>
+          )}
+          
           {isOpen ? (
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 text-white relative z-10 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+            <div className="relative z-10 flex flex-col items-center">
+              <svg className="w-6 h-6 text-white mb-0.5 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <div className="flex items-center space-x-0.5">
+                <div className="w-1 h-1 bg-white rounded-full animate-bounce drop-shadow-sm"></div>
+                <div className="w-1 h-1 bg-white rounded-full animate-bounce drop-shadow-sm" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-1 h-1 bg-white rounded-full animate-bounce drop-shadow-sm" style={{ animationDelay: '0.4s' }}></div>
+              </div>
+            </div>
+          )}
+          
+          {/* Enhanced floating tooltip */}
+          {!isOpen && (
+            <div className="absolute right-full mr-3 bg-gray-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-xl border border-gray-700">
+              ✨ Ask RJ Gems AI Assistant
+              <div className="absolute top-1/2 left-full w-0 h-0 border-l-4 border-l-gray-900 border-t-2 border-b-2 border-t-transparent border-b-transparent transform -translate-y-1/2"></div>
+            </div>
           )}
         </button>
         
-        {/* Notification Badge */}
+        {/* Enhanced Notification Badge */}
         {!isOpen && (
-          <div className="absolute -top-2 -right-2">
-            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-              <span className="text-white text-xs font-bold">AI</span>
+          <div className="absolute -top-2 -right-2 animate-bounce">
+            <div className="w-6 h-6 bg-gradient-to-r from-red-500 via-pink-500 to-red-600 rounded-full flex items-center justify-center animate-pulse shadow-xl border-2 border-white">
+              <span className="text-white text-xs font-bold drop-shadow-sm">AI</span>
             </div>
+            <div className="absolute inset-0 w-6 h-6 bg-red-400 rounded-full animate-ping opacity-40"></div>
+            <div className="absolute inset-0 w-6 h-6 bg-pink-400 rounded-full animate-ping opacity-20" style={{ animationDelay: '0.5s' }}></div>
           </div>
         )}
+        
+        {/* Enhanced glow effect */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 opacity-30 blur-xl animate-pulse shadow-2xl"></div>
       </div>
 
       {/* Chatbot Modal */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex flex-col overflow-hidden">
+        <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-200 z-[9998] flex flex-col overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 p-4 text-white">
             <div className="flex items-center justify-between">

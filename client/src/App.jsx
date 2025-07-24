@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext.jsx';
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import JewelryAssistant from './components/JewelryAssistant.jsx';
@@ -15,12 +15,33 @@ import SignUpPage from './pages/SignUpPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
+// Welcome Banner Component
+const WelcomeBanner = () => {
+  const { user, isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated || !user) return null;
+  
+  return (
+    <div className="bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border-b border-amber-100 py-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <p className="text-amber-800 font-medium">
+            ✨ Welcome back, <span className="font-bold">{user.firstName}</span>! 
+            <span className="ml-2 text-amber-700">Discover our latest luxury jewelry collections</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="App min-h-screen bg-gray-50">
           <Header />
+          <WelcomeBanner />
           <main className="min-h-screen">
             <Routes>
               <Route path="/" element={<HomePage />} />

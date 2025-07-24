@@ -2,8 +2,11 @@ import Hero from '../components/Hero.jsx';
 import ProductGrid from '../components/ProductGrid.jsx';
 import Categories from '../components/Categories.jsx';
 import AIGiftRecommendations from '../components/AIGiftRecommendations.jsx';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomePage = () => {
+  const { isAuthenticated, user } = useAuth();
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

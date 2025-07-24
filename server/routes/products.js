@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const mockProducts = require('../mockData');
+const mongoose = require('mongoose');
 const OpenAI = require('openai');
 
 // For Node.js versions that don't have fetch built-in
@@ -11,39 +13,100 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Helper function to filter mock data
+const filterMockProducts = (query, limit) => {
+  let filtered = [...mockProducts];
+  
+  // Category filter
+  if (query.category) {
+    filtered = filtered.filter(p => p.category === query.category);
+  }
+  
+  // Featured filter
+  if (query.featured === 'true') {
+    filtered = filtered.filter(p => p.featured === true);
+  }
+  
+  // Price range filter
+  if (query.minPrice || query.maxPrice) {
+    filtered = filtered.filter(p => {
+      if (query.minPrice && p.price < parseFloat(query.minPrice)) return false;
+      if (query.maxPrice && p.price > parseFloat(query.maxPrice)) return false;
+      return true;
+    });
+  }
+  
+  // Text search (simple implementation)
+  if (query.search) {
+    const searchTerm = query.search.toLowerCase();
+    filtered = filtered.filter(p => 
+      p.name.toLowerCase().includes(searchTerm) || 
+      p.description.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  // Apply limit
+  return filtered.slice(0, parseInt(limit));
+};
+
 // GET /api/products - Get all products with optional filtering
 router.get('/', async (req, res) => {
   try {
     const { category, featured, search, minPrice, maxPrice, limit = 20 } = req.query;
     
-    let query = {};
+    let useDatabase = false;
+    let products = [];
     
-    // Category filter
-    if (category) {
-      query.category = category;
+    // Try to fetch from database first (if connected and has data)
+    if (mongoose.connection.readyState === 1 && !global.mockDataMode) {
+      try {
+        let query = {};
+        
+        // Category filter
+        if (category) {
+          query.category = category;
+        }
+        
+        // Featured filter
+        if (featured === 'true') {
+          query.featured = true;
+        }
+        
+        // Price range filter
+        if (minPrice || maxPrice) {
+          query.price = {};
+          if (minPrice) query.price.$gte = parseFloat(minPrice);
+          if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+        }
+        
+        // Text search
+        if (search) {
+          query.$text = { $search: search };
+        }
+        
+        products = await Product.find(query)
+          .limit(parseInt(limit))
+          .sort(search ? { score: { $meta: 'textScore' } } : { createdAt: -1 });
+        
+        useDatabase = true;
+      } catch (dbError) {
+        console.log('📦 Database query failed, falling back to mock data:', dbError.message);
+        useDatabase = false;
+      }
     }
     
-    // Featured filter
-    if (featured === 'true') {
-      query.featured = true;
+    // Use mock data if database is not available or has no data
+    if (!useDatabase || products.length === 0) {
+      products = filterMockProducts({ category, featured, search, minPrice, maxPrice }, limit);
+      return res.json({
+        success: true,
+        count: products.length,
+        data: products,
+        message: useDatabase ? 'Database connected but empty - using mock data' : 'Using mock data (MongoDB not connected)'
+      });
     }
     
-    // Price range filter
-    if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
-    }
-    
-    // Text search
-    if (search) {
-      query.$text = { $search: search };
-    }
-    
-    const products = await Product.find(query)
-      .limit(parseInt(limit))
-      .sort(search ? { score: { $meta: 'textScore' } } : { createdAt: -1 });
-    
+    // Return database results
     res.json({
       success: true,
       count: products.length,
@@ -62,6 +125,24 @@ router.get('/', async (req, res) => {
 // GET /api/products/:id - Get single product
 router.get('/:id', async (req, res) => {
   try {
+    // Use mock data if MongoDB is not available
+    if (global.mockDataMode) {
+      const product = mockProducts.find(p => p._id === req.params.id);
+      
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found'
+        });
+      }
+      
+      return res.json({
+        success: true,
+        data: product,
+        message: 'Using mock data (MongoDB not connected)'
+      });
+    }
+    
     const product = await Product.findById(req.params.id);
     
     if (!product) {

@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const ProductCard = ({ product }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { isAuthenticated } = useAuth();
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
@@ -23,7 +25,11 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+    <div className={`group bg-white rounded-lg overflow-hidden border border-gray-100 transition-all duration-300 ${
+      isAuthenticated 
+        ? 'shadow-lg hover:shadow-2xl hover:shadow-amber-500/20 hover:border-amber-200' 
+        : 'shadow-sm hover:shadow-xl'
+    }`}>
       <Link to={`/product/${product._id}`}>
         {/* Image Container */}
         <div 
@@ -56,8 +62,12 @@ const ProductCard = ({ product }) => {
 
           {/* Featured Badge */}
           {product.featured && (
-            <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-xs font-bold px-2 py-1 rounded-full">
-              Featured
+            <div className={`absolute top-3 left-3 text-black text-xs font-bold px-2 py-1 rounded-full ${
+              isAuthenticated
+                ? 'bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 shadow-lg shadow-amber-500/40 animate-shadow-pulse'
+                : 'bg-gradient-to-r from-yellow-500 to-yellow-600'
+            }`}>
+              ✨ Featured
             </div>
           )}
 

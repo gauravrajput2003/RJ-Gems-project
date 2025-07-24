@@ -328,4 +328,34 @@ router.post('/logout', auth, (req, res) => {
   });
 });
 
+// @route   GET /api/auth/debug/users
+// @desc    Debug endpoint to check users in database
+// @access  Public (for debugging only)
+router.get('/debug/users', async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const users = await User.find().select('firstName lastName email createdAt').limit(10);
+    
+    res.json({
+      success: true,
+      message: 'Debug users info',
+      data: {
+        totalUsers,
+        sampleUsers: users,
+        mongoConnection: {
+          connected: require('mongoose').connection.readyState === 1,
+          connectionString: process.env.MONGODB_URI ? 'SET' : 'NOT SET'
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Debug users error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching debug info',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

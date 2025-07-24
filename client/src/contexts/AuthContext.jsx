@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'SET_LOADING', payload: false });
   };
 
-  // Register user
+  // Register user (auto-login version)
   const register = async (userData) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'CLEAR_ERROR' });
@@ -122,11 +122,36 @@ export const AuthProvider = ({ children }) => {
           payload: { user, token }
         });
         
+        // Set loading to false after successful registration
+        dispatch({ type: 'SET_LOADING', payload: false });
+        
         return { success: true, data: response.data };
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Registration failed';
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
+      dispatch({ type: 'SET_LOADING', payload: false });
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  // Register user (no auto-login version)
+  const registerOnly = async (userData) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'CLEAR_ERROR' });
+    
+    try {
+      const response = await axios.post('/auth/register', userData);
+      
+      if (response.data.success) {
+        // Don't set auth token or login, just return success
+        dispatch({ type: 'SET_LOADING', payload: false });
+        return { success: true, data: response.data };
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Registration failed';
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
+      dispatch({ type: 'SET_LOADING', payload: false });
       return { success: false, error: errorMessage };
     }
   };
@@ -221,6 +246,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     ...state,
     register,
+    registerOnly,
     login,
     logout,
     updateProfile,

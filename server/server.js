@@ -12,16 +12,74 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      connectSrc: ["'self'", "http://localhost:*", "https://localhost:*"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
 
 // Logging middleware
 app.use(morgan('combined'));
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175', // Added for your current frontend port
+      'http://localhost:3000',
+      'http://localhost:4173', // Vite preview
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:5174',
+      'http://127.0.0.1:5175', // Added for your current frontend port
+      'http://127.0.0.1:3000',
+      process.env.CLIENT_URL,
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'Authorization',
+    'Cache-Control',
+    'X-Forwarded-For'
+  ],
+  exposedHeaders: ['Authorization'],
+  maxAge: 86400 // 24 hours
 }));
+
+// Handle preflight requests for all routes
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, X-Forwarded-For');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400');
+  res.sendStatus(200);
+});
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -33,19 +91,48 @@ const connectDB = async () => {
     await mongoose.connect(
       process.env.MONGODB_URI || "mongodb+srv://project01:Animal%40%408000@project01.zfjbz.mongodb.net/rjgems?retryWrites=true&w=majority&appName=project01",
       {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
       }
     );
     console.log('✅ MongoDB Connected Successfully');
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
+    console.error('❌ MongoDB connection error:', error.message);
+    console.log('🔄 Falling back to mock data mode...');
+    
+    // Continue without database connection
+    // You can implement mock data or alternative storage here
+    global.mockDataMode = true;
   }
 };
 
 // Connect to MongoDB
 connectDB();
+
+// Additional CORS middleware to ensure headers are always set
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:3000',
+    'http://localhost:4173',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:3000',
+    process.env.CLIENT_URL,
+    process.env.FRONTEND_URL
+  ].filter(Boolean);
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, X-Forwarded-For');
+  next();
+});
 
 // Routes
 app.use('/api/products', productRoutes);

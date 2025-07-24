@@ -4,24 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCollectionsOpen, setIsCollectionsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
-      setIsSearchOpen(false);
-    }
   };
 
   const categories = [
@@ -44,27 +33,39 @@ const Header = () => {
 
   // Add Dashboard to navigation if user is authenticated
   const fullNavigation = isAuthenticated 
-    ? [...navigation.slice(0, 4), { name: 'Dashboard', href: '/dashboard' }, navigation[4]]
+    ? [...navigation, { name: 'Dashboard', href: '/dashboard', hasDropdown: false }]
     : navigation;
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <header className={`bg-white/95 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 transition-all duration-300 ${
+      isAuthenticated 
+        ? 'shadow-xl shadow-amber-500/5' 
+        : 'shadow-lg'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 lg:h-20">
-          {/* Logo */}
+        <div className="flex justify-between items-center h-20 lg:h-24">
+          {/* Logo - Enhanced */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300">
-                <span className="text-white font-bold text-sm">RJ</span>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/25 group-hover:shadow-xl group-hover:shadow-amber-500/35 transition-all duration-300 group-hover:scale-105">
+                  <span className="text-white font-bold text-xl">RJ</span>
+                </div>
+                <div className="absolute -inset-1 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
               </div>
-              <span className="text-2xl font-semibold text-gray-900 tracking-tight group-hover:text-amber-600 transition-colors duration-300">
-                RJ Gems
-              </span>
+              <div className="flex flex-col">
+                <span className="text-4xl font-bold text-gray-900 tracking-tight group-hover:text-amber-600 transition-colors duration-300">
+                  RJ Gems
+                </span>
+                <span className="text-base text-gray-500 font-medium tracking-wider uppercase">
+                  Luxury Jewelry
+                </span>
+              </div>
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          {/* Desktop Navigation - Enhanced */}
+          <nav className="hidden lg:flex items-center space-x-1">
             {fullNavigation.map((item) => (
               <div key={item.name} className="relative group">
                 {item.hasDropdown ? (
@@ -75,38 +76,38 @@ const Header = () => {
                     <NavLink
                       to={item.href}
                       className={({ isActive }) => 
-                        `px-3 py-2 text-sm font-medium transition-colors duration-200 relative group flex items-center ${
+                        `px-5 py-3 text-lg font-semibold transition-all duration-300 rounded-lg relative group flex items-center ${
                           isActive 
-                            ? 'text-amber-600' 
-                            : 'text-gray-700 hover:text-amber-600'
+                            ? 'text-amber-600 bg-amber-50' 
+                            : 'text-gray-700 hover:text-amber-600 hover:bg-amber-50/50'
                         }`
                       }
                     >
                       {item.name}
-                      <svg className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 ml-1 transform transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 transition-all duration-300 group-hover:w-full"></span>
                     </NavLink>
                     
-                    {/* Dropdown Menu */}
+                    {/* Enhanced Dropdown Menu */}
                     {isCollectionsOpen && (
-                      <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
-                        <div className="px-3 py-2 border-b border-gray-100">
-                          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide">Shop by Category</h3>
+                      <div className="absolute top-full left-0 mt-2 w-64 bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl shadow-gray-900/10 border border-gray-200/50 py-3 z-50 animate-fade-in">
+                        <div className="px-4 py-2 border-b border-gray-100">
+                          <h3 className="text-sm font-bold text-amber-600 uppercase tracking-wider">Shop by Category</h3>
                         </div>
                         {categories.map((category) => (
                           <NavLink
                             key={category.name}
                             to={category.href}
                             className={({ isActive }) => 
-                              `block px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                              `flex items-center px-4 py-3 text-lg font-medium transition-all duration-200 rounded-lg mx-2 ${
                                 isActive
-                                  ? 'bg-amber-50 text-amber-600'
-                                  : 'text-gray-700 hover:bg-gray-50 hover:text-amber-600'
+                                  ? 'bg-amber-100 text-amber-700'
+                                  : 'text-gray-700 hover:bg-amber-50 hover:text-amber-600'
                               }`
                             }
                           >
+                            <div className="w-2 h-2 bg-amber-400 rounded-full mr-3"></div>
                             {category.name}
                           </NavLink>
                         ))}
@@ -117,104 +118,64 @@ const Header = () => {
                   <NavLink
                     to={item.href}
                     className={({ isActive }) => 
-                      `px-3 py-2 text-sm font-medium transition-colors duration-200 relative group ${
+                      `px-5 py-3 text-lg font-semibold transition-all duration-300 rounded-lg relative group ${
                         isActive 
-                          ? 'text-amber-600' 
-                          : 'text-gray-700 hover:text-amber-600'
+                          ? 'text-amber-600 bg-amber-50' 
+                          : 'text-gray-700 hover:text-amber-600 hover:bg-amber-50/50'
                       }`
                     }
                   >
                     {item.name}
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 transition-all duration-300 group-hover:w-full"></span>
                   </NavLink>
                 )}
               </div>
             ))}
           </nav>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            {/* Search */}
-            <div className="relative">
-              {isSearchOpen ? (
-                <form onSubmit={handleSearch} className="flex items-center bg-gray-50 rounded-lg px-3 py-2 border border-gray-200 focus-within:border-amber-300 transition-all duration-300">
-                  <input
-                    type="text"
-                    placeholder="Search jewelry..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64 px-3 py-1 bg-transparent text-sm text-gray-900 placeholder-gray-500 focus:outline-none"
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="p-1 text-amber-600 hover:text-amber-700 transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsSearchOpen(false);
-                      setSearchQuery('');
-                    }}
-                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors duration-200 ml-1"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </form>
-              ) : (
-                <button 
-                  onClick={() => setIsSearchOpen(true)}
-                  className="p-2 text-gray-600 hover:text-amber-600 hover:bg-gray-50 rounded-lg transition-all duration-200"
-                  title="Search jewelry"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            {/* Cart Icon */}
-            <button className="p-2 text-gray-600 hover:text-amber-600 hover:bg-gray-50 rounded-lg transition-all duration-200 relative" title="Shopping Cart">
+          {/* Desktop Actions - Enhanced */}
+          <div className="hidden lg:flex items-center space-x-3">
+            {/* Cart Icon - Enhanced */}
+            <button className="relative p-3 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md group" title="Shopping Cart">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
-              <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
                 0
               </span>
             </button>
 
-            {/* Authentication Buttons */}
+            {/* Authentication Buttons - Enhanced */}
             {isAuthenticated ? (
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 p-2 text-gray-700 hover:text-amber-600 hover:bg-gray-50 rounded-lg transition-all duration-200"
+                  className="flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md group"
                   title="Account Menu"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-xs">
+                  <div className="w-9 h-9 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:shadow-xl group-hover:shadow-amber-500/40 transition-all duration-300">
+                    <span className="text-white font-bold text-sm">
                       {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
                     </span>
                   </div>
-                  <span className="font-medium text-sm">{user?.firstName}</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex flex-col items-start">
+                    <span className="font-semibold text-lg text-gray-900 group-hover:text-amber-600 transition-colors">
+                      {user?.firstName}
+                    </span>
+                    <span className="text-sm text-gray-500 font-medium">
+                      Premium Member
+                    </span>
+                  </div>
+                  <svg className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
                 {/* User Dropdown Menu */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
-                    <div className="px-3 py-2 border-b border-gray-100">
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-2xl shadow-amber-500/20 border border-amber-100 py-2 z-50 animate-fade-in">
+                    <div className="px-3 py-2 border-b border-gray-100 bg-gradient-to-r from-amber-50 to-yellow-50">
                       <p className="text-sm font-medium text-gray-900">{user?.firstName} {user?.lastName}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
+                      <p className="text-xs text-amber-600 font-medium">{user?.email}</p>
                     </div>
                     <div className="py-1">
                       <Link
@@ -227,18 +188,6 @@ const Header = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                           <span>Dashboard</span>
-                        </div>
-                      </Link>
-                      <Link
-                        to="/orders"
-                        className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-amber-600 transition-colors duration-200"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                          </svg>
-                          <span>Orders</span>
                         </div>
                       </Link>
                       <Link
@@ -272,16 +221,16 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <Link
                   to="/signin"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-amber-600 transition-colors duration-200"
+                  className="px-6 py-3 text-lg font-semibold text-gray-700 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all duration-200"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition-colors duration-200"
+                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-lg font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/35"
                 >
                   Sign Up
                 </Link>
@@ -289,11 +238,11 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile menu button - Enhanced */}
+          <div className="lg:hidden">
             <button
               onClick={toggleMenu}
-              className="p-2 text-gray-600 hover:text-amber-600 hover:bg-gray-50 rounded-lg transition-all duration-200"
+              className="p-3 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all duration-200 shadow-sm"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMenuOpen ? (
@@ -307,23 +256,24 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Enhanced Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100">
-          <div className="px-4 pt-4 pb-6 space-y-2">
+        <div className="lg:hidden bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl">
+          <div className="px-4 pt-6 pb-8 space-y-2">
             {fullNavigation.map((item) => (
               <div key={item.name}>
                 <NavLink
                   to={item.href}
                   className={({ isActive }) => 
-                    `block px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                    `flex items-center px-4 py-3 text-lg font-semibold rounded-xl transition-all duration-200 ${
                       isActive 
                         ? 'text-amber-600 bg-amber-50' 
-                        : 'text-gray-700 hover:text-amber-600 hover:bg-gray-50'
+                        : 'text-gray-700 hover:text-amber-600 hover:bg-amber-50/50'
                     }`
                   }
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <div className="w-2 h-2 bg-amber-400 rounded-full mr-3"></div>
                   {item.name}
                 </NavLink>
                 {item.hasDropdown && (
@@ -333,7 +283,7 @@ const Header = () => {
                         key={category.name}
                         to={category.href}
                         className={({ isActive }) => 
-                          `block px-3 py-2 text-sm rounded-lg transition-colors duration-200 ${
+                          `block px-3 py-2 text-base rounded-lg transition-colors duration-200 ${
                             isActive
                               ? 'text-amber-600 bg-amber-50'
                               : 'text-gray-600 hover:text-amber-600 hover:bg-gray-50'
@@ -348,27 +298,6 @@ const Header = () => {
                 )}
               </div>
             ))}
-            
-            {/* Mobile Search */}
-            <div className="pt-4 border-t border-gray-100">
-              <form onSubmit={handleSearch} className="flex items-center bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <input
-                  type="text"
-                  placeholder="Search jewelry..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 px-2 py-1 bg-transparent text-sm text-gray-900 placeholder-gray-500 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="ml-2 p-1 text-amber-600 hover:text-amber-700 transition-colors duration-200"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              </form>
-            </div>
           </div>
           
           {/* Mobile Action Buttons */}
@@ -383,7 +312,7 @@ const Header = () => {
                     0
                   </span>
                 </div>
-                <span className="text-xs font-medium mt-1">Cart</span>
+                <span className="text-sm font-semibold mt-1">Cart</span>
               </button>
               
               {isAuthenticated ? (
@@ -397,7 +326,7 @@ const Header = () => {
                       {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
                     </span>
                   </div>
-                  <span className="text-xs font-medium mt-1">Dashboard</span>
+                  <span className="text-sm font-semibold mt-1">Dashboard</span>
                 </Link>
               ) : (
                 <Link
@@ -408,25 +337,25 @@ const Header = () => {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  <span className="text-xs font-medium mt-1">Sign In</span>
+                  <span className="text-sm font-semibold mt-1">Sign In</span>
                 </Link>
               )}
             </div>
             
-            {/* Mobile Auth Section */}
+            {/* Mobile Auth Section - Enhanced */}
             {!isAuthenticated && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="space-y-2">
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="space-y-3">
                   <Link
                     to="/signup"
-                    className="w-full bg-amber-500 text-white font-medium py-2 px-4 rounded-lg hover:bg-amber-600 transition-colors duration-200 text-center block"
+                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold py-4 px-4 rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-200 text-center block shadow-lg shadow-amber-500/25 text-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Create Account
                   </Link>
                   <Link
                     to="/signin"
-                    className="w-full bg-white text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors duration-200 text-center block"
+                    className="w-full bg-white text-gray-700 font-semibold py-4 px-4 rounded-xl border border-gray-300 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-600 transition-all duration-200 text-center block text-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In
