@@ -533,13 +533,11 @@ For any questions or support:
 
 ---
 
-⭐ **If this project helped you or showcases useful patterns, please star the repository!**
 
-![Made with ❤️ by Gaurav Rajput](https://img.shields.io/badge/Made%20with%20❤️%20by-Gaurav%20Rajput-red?style=for-the-badge)
 
-## 🎨 Design System
 
-### Color Palette
+
+
 - **Primary Gold**: `#D4AF37` - Main accent color
 - **Light Gold**: `#F4E4A6` - Highlights and backgrounds
 - **Dark Gold**: `#B8860B` - Hover states and emphasis
@@ -547,13 +545,13 @@ For any questions or support:
 - **White**: `#FFFFFF` - Backgrounds and text on dark
 - **Gray Scale**: Various shades for UI elements
 
-### Typography
+
 - **Primary Font**: Inter (system fonts fallback)
 - **Headings**: Bold weights (600-700)
 - **Body Text**: Regular weight (400)
 - **Accents**: Medium weight (500)
 
-### Component Guidelines
+
 - **Cards**: Subtle shadows with hover effects
 - **Buttons**: Gradient backgrounds with smooth transitions
 - **Images**: Aspect ratio maintained with lazy loading

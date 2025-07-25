@@ -3,15 +3,9 @@ const router = express.Router();
 const Product = require('../models/Product');
 const mockProducts = require('../mockData');
 const mongoose = require('mongoose');
-const OpenAI = require('openai');
 
 // For Node.js versions that don't have fetch built-in
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
-// Initialize OpenAI (will be configured with environment variable)
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 // Helper function to filter mock data
 const filterMockProducts = (query, limit) => {
@@ -184,25 +178,8 @@ router.get('/:id/recommendations', async (req, res) => {
       category: product.category
     }).limit(4);
 
-    // If OpenAI is configured, enhance recommendations with AI
+    // Simple category-based recommendations
     let aiRecommendations = [];
-    if (process.env.OPENAI_API_KEY) {
-      try {
-        const prompt = `Based on this jewelry product: "${product.name}" - ${product.description}, recommend similar luxury jewelry items. Focus on style, material, and price range. Respond with just product names separated by commas.`;
-        
-        const completion = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: 100,
-          temperature: 0.7,
-        });
-
-        const recommendations = completion.choices[0].message.content.split(',').map(name => name.trim());
-        aiRecommendations = recommendations.slice(0, 3);
-      } catch (aiError) {
-        console.log('AI recommendations unavailable:', aiError.message);
-      }
-    }
 
     res.json({
       success: true,
@@ -316,40 +293,9 @@ router.post('/ai-search', async (req, res) => {
       });
     }
 
-    // First, try to extract filters using AI if available
+    // Basic search filters
     let searchFilters = {};
     let searchTerms = query.toLowerCase();
-
-    if (process.env.OPENAI_API_KEY) {
-      try {
-        const filterPrompt = `Extract search filters from this jewelry search query: "${query}"
-        
-        Return a JSON object with these possible fields:
-        - category: "rings", "necklaces", "earrings", or "bracelets"
-        - minPrice: number
-        - maxPrice: number
-        - material: string (gold, silver, platinum, etc.)
-        - searchText: key words to search for
-        
-        Example: "Show me gold rings under $1000" -> {"category": "rings", "maxPrice": 1000, "material": "gold", "searchText": "gold rings"}`;
-
-        const completion = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: filterPrompt }],
-          max_tokens: 150,
-          temperature: 0.3,
-        });
-
-        try {
-          const aiFilters = JSON.parse(completion.choices[0].message.content);
-          searchFilters = aiFilters;
-        } catch (parseError) {
-          console.log('Could not parse AI filters, using basic search');
-        }
-      } catch (aiError) {
-        console.log('AI search enhancement unavailable:', aiError.message);
-      }
-    }
 
     // Build MongoDB query
     let mongoQuery = {};

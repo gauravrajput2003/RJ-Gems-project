@@ -10,13 +10,21 @@ const router = express.Router();
 // Rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
+  max: process.env.NODE_ENV === 'production' ? 10 : 100, // 10 in production, 100 in development
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again later.'
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting in development for localhost
+    if (process.env.NODE_ENV !== 'production' && 
+        (req.ip === '127.0.0.1' || req.ip === '::1' || req.ip.includes('localhost'))) {
+      return true;
+    }
+    return false;
+  }
 });
 
 // Generate JWT Token
