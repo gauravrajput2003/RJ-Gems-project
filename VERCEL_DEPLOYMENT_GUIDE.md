@@ -25,7 +25,7 @@ NODE_ENV=production
 PORT=3000
 MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net/rjgems?retryWrites=true&w=majority
 JWT_SECRET=b14d7f2a6342d0e766a24832a6af61b0be7626a8783580f19b7d0b0ab0aa178a
-GEMINI_API_KEY=AIzaSyAsfhrGnqovYK-mk97AO5znpgfT23CZMq0
+GEMINI_API_KEY=[YOUR_GEMINI_API_KEY_FROM_.ENV]
 CLIENT_URL=https://silly-sprinkles-b1d938.netlify.app
 ```
 
@@ -75,7 +75,7 @@ mongodb+srv://rjgemsuser:your-password@rj-gems-cluster.xxxxx.mongodb.net/rjgems?
 Update your frontend `.env.production` file:
 ```
 VITE_API_BASE_URL=https://rj-gems-backend.vercel.app
-VITE_GEMINI_API_KEY=AIzaSyAsfhrGnqovYK-mk97AO5znpgfT23CZMq0
+VITE_GEMINI_API_KEY=[YOUR_GEMINI_API_KEY_FROM_.ENV]
 ```
 
 ## Step 6: Redeploy Frontend
