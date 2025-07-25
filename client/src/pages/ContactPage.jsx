@@ -71,8 +71,7 @@ const ContactPage = () => {
       // Simulate API call - replace with actual backend endpoint
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // For now, just log the form data
-      console.log('Form submitted successfully:', formData);
+      // Form submitted successfully
       
       setSubmitStatus('success');
       

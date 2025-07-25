@@ -56,7 +56,7 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
+      // CORS blocked origin
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -102,10 +102,10 @@ const connectDB = async () => {
         socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
       }
     );
-    console.log('✅ MongoDB Connected Successfully');
+    // MongoDB Connected Successfully
   } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
-    console.log('🔄 Falling back to mock data mode...');
+    // Falling back to mock data mode
     
     // Continue without database connection
     // You can implement mock data or alternative storage here
@@ -175,15 +175,15 @@ app.use((error, req, res, next) => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
+  // SIGTERM received. Shutting down gracefully...
   mongoose.connection.close(() => {
-    console.log('MongoDB connection closed.');
+    // MongoDB connection closed.
     process.exit(0);
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📍 API Base URL: http://localhost:${PORT}/api`);
-  console.log(`🔗 Health Check: http://localhost:${PORT}/api/health`);
+  // Server running on port ${PORT}
+  // API Base URL: http://localhost:${PORT}/api
+  // Health Check: http://localhost:${PORT}/api/health
 });

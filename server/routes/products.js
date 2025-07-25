@@ -84,7 +84,7 @@ router.get('/', async (req, res) => {
         
         useDatabase = true;
       } catch (dbError) {
-        console.log('📦 Database query failed, falling back to mock data:', dbError.message);
+        // Database query failed, falling back to mock data
         useDatabase = false;
       }
     }

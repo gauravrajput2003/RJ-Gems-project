@@ -204,34 +204,34 @@ async function seedDatabase() {
       useUnifiedTopology: true,
     });
 
-    console.log('Connected to MongoDB');
+    // Connected to MongoDB
 
     // Clear existing products
     await Product.deleteMany({});
-    console.log('Cleared existing products');
+    // Cleared existing products
 
     // Insert sample products
     const insertedProducts = await Product.insertMany(sampleProducts);
-    console.log(`✅ Successfully seeded ${insertedProducts.length} products`);
+    // Successfully seeded products
 
     // Display summary
     const categories = await Product.aggregate([
       { $group: { _id: '$category', count: { $sum: 1 } } }
     ]);
     
-    console.log('\n📊 Products by category:');
+    // Products by category:
     categories.forEach(cat => {
-      console.log(`  ${cat._id}: ${cat.count} products`);
+      // ${cat._id}: ${cat.count} products
     });
 
     const featuredCount = await Product.countDocuments({ featured: true });
-    console.log(`⭐ Featured products: ${featuredCount}`);
+    // Featured products: ${featuredCount}
 
   } catch (error) {
     console.error('❌ Error seeding database:', error);
   } finally {
     await mongoose.connection.close();
-    console.log('Database connection closed');
+    // Database connection closed
   }
 }
 

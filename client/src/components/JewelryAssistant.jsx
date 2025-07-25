@@ -21,12 +21,12 @@ const JewelryAssistant = () => {
 
   // Debug log to confirm component is rendering
   useEffect(() => {
-    console.log('🤖 JewelryAssistant mounted, initial state:', isOpen);
+    // JewelryAssistant mounted
   }, []);
 
   // Monitor state changes
   useEffect(() => {
-    console.log('✨ AI Chatbot state changed to:', isOpen ? 'OPEN' : 'CLOSED');
+    // AI Chatbot state changed
   }, [isOpen]);
 
   // Auto scroll to bottom when new messages arrive
@@ -95,7 +95,7 @@ const JewelryAssistant = () => {
   };
 
   const toggleChatbot = (e) => {
-    console.log('🔄 TOGGLE FUNCTION CALLED!');
+    // Toggle function called
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -103,7 +103,7 @@ const JewelryAssistant = () => {
     
     setIsOpen(prevState => {
       const newState = !prevState;
-      console.log('🎯 State changing from', prevState, 'to', newState);
+      // State changing
       return newState;
     });
   };
@@ -127,15 +127,11 @@ const JewelryAssistant = () => {
         <button
           type="button"
           onClick={(e) => {
-            console.log('🎯 MAIN BUTTON CLICKED!', e);
+            // Main button clicked
             e.preventDefault();
             e.stopPropagation();
             toggleChatbot(e);
           }}
-          onMouseDown={() => console.log('🔽 Mouse down on AI button')}
-          onMouseUp={() => console.log('🔼 Mouse up on AI button')}
-          onMouseEnter={() => console.log('📍 AI button hover entered')}
-          onMouseLeave={() => console.log('📍 AI button hover left')}
           className={`relative w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 transform hover:scale-110 border-2 cursor-pointer focus:outline-none ${
             isOpen 
               ? 'bg-red-500 hover:bg-red-600 rotate-45 animate-pulse border-red-400 shadow-red-500/50' 
