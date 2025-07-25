@@ -1,14 +1,84 @@
+# IDE and Editor files
 /.github
 /.vscode
+.vscode/
+*.swp
+*.swo
+*~
+
+# Dependencies (CRITICAL - NEVER COMMIT)
 /node_modules
+node_modules/
+**/node_modules/
+server/node_modules/
+client/node_modules/
+package-lock.json
+**/package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # Environment variables (NEVER commit these)
 .env
 .env.local
 .env.production
 .env.development
+.env.test
 server/.env
 client/.env
+**/.env
+**/.env.*
 
-# API Keys and Secrets
+# API Keys and Secrets (CRITICAL)
 **/RENDER_ENV_VARS.txt
+**/*_ENV_VARS.txt
+**/*API_KEY*
+**/*SECRET*
+*.pem
+*.key
+*.crt
+
+# Build outputs
+dist/
+build/
+**/dist/
+**/build/
+client/dist/
+.next/
+.nuxt/
+.vuepress/dist
+.out/
+.cache/
+
+# Testing
+coverage/
+.nyc_output/
+.jest-cache/
+*.lcov
+test-results/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.tmp
